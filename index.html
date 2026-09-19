@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INVEST-MOBILE</title>
+    <link rel="icon" type="image/png" href="image.png">
+    <link rel="apple-touch-icon" href="image.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <style>
+        :root { --primary: #059669; --bg-light: #ffffff; --card-bg: #f8fafc; --text-dark: #0f172a; --text-muted: #64748b; --border-color: #e2e8f0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background-color: #f1f5f9; color: var(--text-dark); display: flex; justify-content: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 480px; background-color: var(--bg-light); min-height: 100vh; padding-bottom: 80px; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #fff; border-bottom: 1px solid var(--border-color); sticky; top: 0; }
+        .brand-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; color: var(--primary); }
+        .brand-logo img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
+        .view-section { display: none; padding: 16px; }
+        .view-section.active { display: block; }
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .project-card { background: #fff; border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+        .project-media { width: 100%; height: 180px; object-fit: cover; background: #000; }
+        .project-body { padding: 14px; }
+        .btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-sec { background: #64748b; }
+        .form-control { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 10px; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 480px; height: 60px; background: #fff; border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; color: var(--text-muted); border: none; background: none; }
+        .avatar-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <div class="brand-logo">
+            <img src="image.png" alt="Logo" onerror="this.src='https://via.placeholder.com/36'">
+            <span>INVEST-MOBILE</span>
+        </div>
+        <span onclick="switchTab('profile')" style="cursor:pointer;">⚙️</span>
+    </div>
+
+    <!-- View Accueil -->
+    <div id="view-home" class="view-section active">
+        <h3>Opportunités d'Investissement</h3><br>
+        <div class="project-card">
+            <video class="project-media" controls poster="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80">
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            </video>
+            <div class="project-body">
+                <h4>Projet Agricole - Extension Maïs</h4>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin: 6px 0;">Acquisition de 10 hectares. Cession de 20% des parts.</p>
+                <button class="btn" onclick="alert('Demande transmise au propriétaire !')">Investir / Contacter</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Portefeuille -->
+    <div id="view-wallet" class="view-section">
+        <h3>Votre Portefeuille</h3><br>
+        <div class="card" style="background:#ecfdf5;">
+            <span>Solde Disponible</span>
+            <h1 style="color:var(--primary); margin:8px 0;">12,500 $</h1>
+            <small>Airtel, M-Pesa, Orange, Visa</small>
+        </div>
+    </div>
+
+    <!-- View Profil -->
+    <div id="view-profile" class="view-section">
+        <div style="text-align:center; margin-bottom:15px;">
+            <img id="avatar-preview" class="avatar-img" src="image.png" onerror="this.src='https://via.placeholder.com/80'"><br>
+            <button class="btn" style="width:auto; padding:5px 10px; margin-top:5px; font-size:0.8rem;" onclick="document.getElementById('avatar-file').click()">📷 Changer photo</button>
+            <h3 id="profile-name" style="margin-top:10px;">Compte Utilisateur</h3>
+            <span id="profile-tag" style="font-size:0.75rem; background:#e2e8f0; padding:2px 8px; border-radius:10px;">Standard</span>
+        </div>
+
+        <input type="file" id="avatar-file" accept="image/*" style="display:none;" onchange="updatePhoto(this)">
+
+        <div class="card">
+            <h4>Formulaire d'Inscription</h4><br>
+            <form onsubmit="saveUser(event)">
+                <input type="text" class="form-control" placeholder="Nom complet" required>
+                <input type="text" class="form-control" placeholder="E-mail ou Téléphone" required>
+                <input type="password" class="form-control" placeholder="Mot de passe" required>
+                <button type="submit" class="btn">S'inscrire / Confirmer</button>
+            </form>
+            <br>
+            <button class="btn btn-sec" onclick="checkChef()">🔑 Déverrouiller Chef d'Application</button>
+        </div>
+
+        <div class="card">
+            <h4>Mode Premium</h4><br>
+            <input type="text" id="promo-input" class="form-control" placeholder="Entrez le code promo">
+            <button class="btn" onclick="checkPromo()">Activer Premium</button>
+        </div>
+    </div>
+
+    <!-- Nav Bottom -->
+    <div class="bottom-nav">
+        <button class="nav-item" onclick="switchTab('home')">🏠<span>Accueil</span></button>
+        <button class="nav-item" onclick="switchTab('wallet')">💰<span>Portefeuille</span></button>
+        <button class="nav-item" onclick="switchTab('profile')">👤<span>Profil</span></button>
+    </div>
+</div><script>
+    function switchTab(tab) {
+        document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
+        document.getElementById('view-' + tab).classList.add('active');
+    }
+
+    function updatePhoto(input) {
+        if (input.files && input.files[0]) {
+            let r = new FileReader();
+            r.onload = function(e) { document.getElementById('avatar-preview').src = e.target.result; };
+            r.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function saveUser(e) {
+        e.preventDefault();
+        alert("✓ Votre compte a été créé et vérifié avec succès !");
+    }
+
+    function checkChef() {
+        let p = prompt("Entrez le mot de passe Chef d'Application :");
+        if (p === "CHEF2026") {
+            document.getElementById('profile-name').innerText = "Chef d'Application (Fondateur)";
+            document.getElementById('profile-tag').innerText = "✓ Accès Admin Certifié";
+            document.getElementById('profile-tag').style.background = "#dcfce7";
+            document.getElementById('profile-tag').style.color = "#15803d";
+            alert("Accès Fondateur déverrouillé !");
+        } else if (p !== null) {
+            alert("Mot de passe incorrect.");
+        }
+    }
+
+    function checkPromo() {
+        let code = document.getElementById('promo-input').value.trim();
+        if (code === "INVEST2026") {
+            alert("🌟 Mode Premium activé avec succès !");
+        } else {
+            alert("Code invalide.");
+        }
+    }
+</script>
+</body>
+</html>
+
