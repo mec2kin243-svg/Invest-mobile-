@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>INVEST-MOBILE</title>
+    
+    <link rel="icon" type="image/png" href="image.png">
+    <link rel="apple-touch-icon" href="image.png">
+
+    <style>
+        :root {
+            --bg-body: #f4f6f9;
+            --bg-card: #ffffff;
+            --primary: #059669;
+            --primary-dark: #047857;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+            --border: #e5e7eb;
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            padding-bottom: 80px;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #ffffff;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand img {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .brand-title {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Badge pour notifications */
+        .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: #ef4444;
+            color: white;
+            font-size: 0.65rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        /* Vues */
+        .view-section {
+            display: none;
+            padding: 16px;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        /* Catégories */
+        .categories-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+            scrollbar-width: none;
+        }
+
+        .categories-scroll::-webkit-scrollbar { display: none; }
+
+        .chip {
+            background: #ffffff;
+            color: var(--text-sub);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            border: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .chip.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Cartes & Composants */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .card-media {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .card-body {
+            padding: 14px;
+        }
+
+        .card-tag {
+            display: inline-block;
+            background: #ecfdf5;
+            color: var(--primary);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-primary:active {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        /* Formulaires */
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Profil avec couverture & avatar */
+        .profile-cover {
+            position: relative;
+            height: 110px;
+            background: #374151;
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .cover-edit-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .profile-header-body {
+            text-align: center;
+            padding: 0 16px 16px;
+            position: relative;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: -40px auto 8px;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .avatar-edit-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Liste d'options */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Interrupteur (Switch) */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: #ffffff;
+            border-radius: var(--radius);
+            padding: 20px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* Navigation basse */
+        nav.bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 65px;
+            background: #ffffff;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: var(--text-sub);
+            font-size: 0.75rem;
+            cursor: pointer;
+            width: 20%;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .nav-icon { font-size: 1.2rem; }
+    </style>
+</head><body>
+
+    <!-- Header -->
+    <header>
+        <div class="brand">
+            <img src="image.png" alt="Logo" onerror="this.style.display='none'">
+            <div class="brand-title">INVEST-MOBILE</div>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="toggleSearch()" title="Recherche">🔍</button>
+            <button class="icon-btn" onclick="showNotifications()" title="Notifications">
+                🔔<span class="badge" id="notif-count">2</span>
+            </button>
+            <button class="icon-btn" onclick="switchTab('profile', document.querySelector('.nav-item:last-child'))" title="Paramètres">⚙️</button>
+        </div>
+    </header>
+
+    <!-- Barre de recherche repliable -->
+    <div id="search-bar" style="display: none; padding: 10px 16px; background: #fff; border-bottom: 1px solid var(--border);">
+        <input type="text" id="search-input" class="form-input" placeholder="Rechercher un projet, un marché..." onkeyup="filterProjects()">
+    </div>
+
+    <!-- ACCUEIL -->
+    <section id="view-home" class="view-section active">
+        <div class="categories-scroll">
+            <div class="chip active" onclick="filterCategory('Tous', this)">Tous</div>
+            <div class="chip" onclick="filterCategory('Immobilier', this)">Immobilier</div>
+            <div class="chip" onclick="filterCategory('Agricole', this)">Agricole</div>
+            <div class="chip" onclick="filterCategory('L\'État', this)">L'État</div>
+            <div class="chip" onclick="filterCategory('Restauration', this)">Restauration</div>
+            <div class="chip" onclick="filterCategory('Business', this)">Business</div>
+        </div>
+
+        <h3 style="margin-bottom: 12px; font-size: 1rem;">Marchés & Opportunités</h3>
+
+        <!-- Projet 1 avec Vidéo -->
+        <div class="card project-item" data-category="Agricole">
+            <video class="card-media" controls poster="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80">
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            </video>
+            <div class="card-body">
+                <span class="card-tag">Agricole</span>
+                <div class="card-title">Projet Agricole - Extension Maïs</div>
+                <div class="card-desc">Recherche d'un investisseur pour l'acquisition de 10 hectares. Cession de 20% des parts.</div>
+                <button class="btn btn-primary" onclick="investInProject('Extension Maïs')">Investir dans ce projet</button>
+            </div>
+        </div>
+
+        <!-- Projet 2 -->
+        <div class="card project-item" data-category="Immobilier">
+            <img class="card-media" src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80" alt="Immo">
+            <div class="card-body">
+                <span class="card-tag">Immobilier</span>
+                <div class="card-title">Résidence Immo - Phase 1</div>
+                <div class="card-desc">Opportunité d'investissement dans un complexe résidentiel sécurisé.</div>
+                <button class="btn btn-primary" onclick="investInProject('Résidence Immo')">Investir dans ce projet</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- MESSAGERIE -->
+    <section id="view-chat" class="view-section">
+        <h3 style="margin-bottom: 12px; font-size: 1rem;">Conversations récentes</h3>
+        <div class="card" style="padding: 14px; cursor: pointer;" onclick="openChat('Agent INVEST-MOBILE #104')">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <strong>Agent INVEST-MOBILE #104</strong>
+                <span style="font-size: 0.75rem; color: var(--text-sub);">10:42</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-sub);">Votre acte de vente a été vérifié. Le contrat est prêt pour signature...</p>
+        </div>
+        <div class="card" style="padding: 14px; cursor: pointer;" onclick="openChat('Investisseur Agricole')">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <strong>Partenaire Maïs</strong>
+                <span style="font-size: 0.75rem; color: var(--text-sub);">Hier</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-sub);">Bonjour, je suis intéressé par la cession de 20% des parts.</p>
+        </div>
+    </section>    <!-- SUIVI PROJETS -->
+    <section id="view-projects" class="view-section">
+        <h3 style="margin-bottom: 12px; font-size: 1rem;">Vos Projets & Investissements</h3>
+        <p style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">N.B : Le vendeur peut aussi être un investisseur sur d'autres projets.</p>
+        <div class="card" style="padding: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong>Extension Maïs (Vendeur)</strong>
+                <div style="font-size: 0.8rem; color: var(--text-sub);">Acquisition 10 Ha</div>
+            </div>
+            <button class="btn btn-secondary" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="alert('Statut : En négociation finale')">En négociation</button>
+        </div>
+    </section>
+
+    <!-- PORTEFEUILLE -->
+    <section id="view-wallet" class="view-section">
+        <div class="card" style="background: linear-gradient(135deg, #059669, #047857); color: #fff; padding: 20px;">
+            <div style="font-size: 0.85rem; opacity: 0.9;">Montant en poche (Disponible)</div>
+            <div id="wallet-balance" style="font-size: 1.8rem; font-weight: 800; margin: 6px 0;">12,500 $</div>
+            <div style="font-size: 0.75rem; opacity: 0.8;">Disponible via Mobile Money & Banques dès confirmation.</div>
+        </div>
+
+        <div class="card" style="padding: 14px;">
+            <h4 style="margin-bottom: 10px; font-size: 0.9rem;">Comptes de Paiement & Retrait</h4>
+            <div class="setting-item">
+                <span>📱 Mobile Money (Airtel, M-Pesa, Orange)</span>
+                <button class="btn btn-secondary" style="width: auto; padding: 4px 10px; font-size: 0.8rem;" onclick="managePayment('Mobile Money')">Gérer</button>
+            </div>
+            <div class="setting-item">
+                <span>💳 Compte Bancaire / Carte Visa</span>
+                <button class="btn btn-secondary" style="width: auto; padding: 4px 10px; font-size: 0.8rem;" onclick="managePayment('Carte/Banque')">Gérer</button>
+            </div>
+        </div>
+
+        <div class="card" style="padding: 14px;">
+            <h4 style="margin-bottom: 8px; font-size: 0.9rem;">🌟 Activer le Mode Premium (Code Promo)</h4>
+            <p style="font-size: 0.78rem; color: var(--text-sub); margin-bottom: 10px;">Entrez votre code privilège pour débloquer toutes les fonctionnalités Premium.</p>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="promo-code" class="form-input" placeholder="Code promo (ex: PROMO2026)">
+                <button class="btn btn-primary" style="width: auto;" onclick="applyPromoCode()">Activer</button>
+            </div>
+        </div>
+    </section>    <!-- PROFIL / COMPTE -->
+    <section id="view-profile" class="view-section">
+        <div class="card">
+            <input type="file" id="cover-input" accept="image/*" style="display:none;" onchange="loadCover(this)">
+            <input type="file" id="avatar-input" accept="image/*" style="display:none;" onchange="loadAvatar(this)">
+
+            <div id="profile-cover" class="profile-cover" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80');">
+                <button class="cover-edit-btn" onclick="document.getElementById('cover-input').click()">📷 Couverture</button>
+            </div>
+
+            <div class="profile-header-body">
+                <div class="avatar-container">
+                    <img id="profile-avatar" class="avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Avatar">
+                    <button class="avatar-edit-btn" onclick="document.getElementById('avatar-input').click()">📷</button>
+                </div>
+                <h2 id="display-name" style="font-size: 1.1rem; font-weight: 700;">Williams Nzewa Ushindi</h2>
+                <div id="display-status" style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">Compte Utilisateur (Vendeur & Investisseur)</div>
+            </div>
+        </div>
+
+        <!-- Enregistrement & Mise à jour -->
+        <div class="card" style="padding: 16px;">
+            <h3 style="font-size: 0.95rem; margin-bottom: 12px;">Enregistrement & Mises à jour du compte</h3>
+            <form onsubmit="startAccountRegistration(event)">
+                <div class="form-group">
+                    <label class="form-label">Nom</label>
+                    <input type="text" id="input-nom" class="form-input" value="Nzewa" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Prénom</label>
+                    <input type="text" id="input-prenom" class="form-input" value="Williams" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Postnom</label>
+                    <input type="text" id="input-postnom" class="form-input" value="Ushindi" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mot de passe du compte</label>
+                    <input type="password" id="input-pwd" class="form-input" placeholder="Créer votre mot de passe" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer & Demander le Code de Confirmation</button>
+            </form>
+        </div>
+
+        <!-- Réglages & Sécurité -->
+        <div class="card" style="padding: 14px;">
+            <h4 style="margin-bottom: 10px; font-size: 0.9rem;">🔒 Sécurité & Préférences</h4>
+            <div class="setting-item">
+                <span>Authentification à deux facteurs (2FA)</span>
+                <label class="switch">
+                    <input type="checkbox" id="2fa-switch" onchange="toggle2FA(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span>Notifications de transactions</span>
+                <label class="switch">
+                    <input type="checkbox" checked onchange="alert('Préférence de notification mise à jour !')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item" onclick="changePassword()" style="cursor: pointer;">
+                <span>Changer le mot de passe</span>
+                <span>➡️</span>
+            </div>
+        </div>
+
+        <!-- Espace Administrateur -->
+        <div class="card" style="padding: 14px; border-left: 4px solid var(--primary);">
+            <h4 style="font-size: 0.9rem; margin-bottom: 4px;">Espace Administrateur</h4>
+            <p style="font-size: 0.78rem; color: var(--text-sub); margin-bottom: 10px;">Réservé au propriétaire de l'application.</p>
+            <button class="btn btn-secondary" onclick="unlockAdminMode()">Connexion Administrateur</button>
+        </div>
+    </section>
+
+    <!-- Modal de vérification du code -->
+    <div id="verify-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="font-size: 1rem; margin-bottom: 8px;">Code de Confirmation</h3>
+            <p style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">Un code de vérification a été généré. Veuillez saisir le code <strong id="generated-code-display" style="color: var(--primary);">----</strong> ci-dessous pour confirmer votre compte :</p>
+            <div class="form-group">
+                <input type="text" id="user-entered-code" class="form-input" placeholder="Saisir le code à 4 chiffres" maxlength="4">
+            </div>
+            <button class="btn btn-primary" onclick="confirmAccountCode()">Valider et Confirmer le Compte</button>
+        </div>
+    </div>
+
+    <!-- Navigation basse 5 boutons -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home', this)">
+            <span class="nav-icon">🏠</span>
+            <span>Accueil</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('chat', this)">
+            <span class="nav-icon">💬</span>
+            <span>Messagerie</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('projects', this)">
+            <span class="nav-icon">📈</span>
+            <span>Suivi</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('wallet', this)">
+            <span class="nav-icon">💰</span>
+            <span>Portefeuille</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('profile', this)">
+            <span class="nav-icon">👤</span>
+            <span>Profil</span>
+        </div>
+    </nav>    <!-- PROFIL / COMPTE -->
+    <section id="view-profile" class="view-section">
+        <div class="card">
+            <input type="file" id="cover-input" accept="image/*" style="display:none;" onchange="loadCover(this)">
+            <input type="file" id="avatar-input" accept="image/*" style="display:none;" onchange="loadAvatar(this)">
+
+            <div id="profile-cover" class="profile-cover" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80');">
+                <button class="cover-edit-btn" onclick="document.getElementById('cover-input').click()">📷 Couverture</button>
+            </div>
+
+            <div class="profile-header-body">
+                <div class="avatar-container">
+                    <img id="profile-avatar" class="avatar-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Avatar">
+                    <button class="avatar-edit-btn" onclick="document.getElementById('avatar-input').click()">📷</button>
+                </div>
+                <h2 id="display-name" style="font-size: 1.1rem; font-weight: 700;">Williams Nzewa Ushindi</h2>
+                <div id="display-status" style="font-size: 0.8rem; color: var(--text-sub); margin-top: 2px;">Compte Utilisateur (Vendeur & Investisseur)</div>
+            </div>
+        </div>
+
+        <!-- Enregistrement & Mise à jour -->
+        <div class="card" style="padding: 16px;">
+            <h3 style="font-size: 0.95rem; margin-bottom: 12px;">Enregistrement & Mises à jour du compte</h3>
+            <form onsubmit="startAccountRegistration(event)">
+                <div class="form-group">
+                    <label class="form-label">Nom</label>
+                    <input type="text" id="input-nom" class="form-input" value="Nzewa" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Prénom</label>
+                    <input type="text" id="input-prenom" class="form-input" value="Williams" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Postnom</label>
+                    <input type="text" id="input-postnom" class="form-input" value="Ushindi" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mot de passe du compte</label>
+                    <input type="password" id="input-pwd" class="form-input" placeholder="Créer votre mot de passe" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Enregistrer & Demander le Code de Confirmation</button>
+            </form>
+        </div>        <!-- Réglages & Sécurité -->
+        <div class="card" style="padding: 14px;">
+            <h4 style="margin-bottom: 10px; font-size: 0.9rem;">🔒 Sécurité & Préférences</h4>
+            <div class="setting-item">
+                <span>Authentification à deux facteurs (2FA)</span>
+                <label class="switch">
+                    <input type="checkbox" id="2fa-switch" onchange="toggle2FA(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span>Notifications de transactions</span>
+                <label class="switch">
+                    <input type="checkbox" checked onchange="alert('Préférence de notification mise à jour !')">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item" onclick="changePassword()" style="cursor: pointer;">
+                <span>Changer le mot de passe</span>
+                <span>➡️</span>
+            </div>
+        </div>
+
+        <!-- Espace Administrateur -->
+        <div class="card" style="padding: 14px; border-left: 4px solid var(--primary);">
+            <h4 style="font-size: 0.9rem; margin-bottom: 4px;">Espace Administrateur</h4>
+            <p style="font-size: 0.78rem; color: var(--text-sub); margin-bottom: 10px;">Réservé au propriétaire de l'application.</p>
+            <button class="btn btn-secondary" onclick="unlockAdminMode()">Connexion Administrateur</button>
+        </div>
+    </section>
+
+    <!-- Modal de vérification du code -->
+    <div id="verify-modal" class="modal">
+        <div class="modal-content">
+            <h3 style="font-size: 1rem; margin-bottom: 8px;">Code de Confirmation</h3>
+            <p style="font-size: 0.8rem; color: var(--text-sub); margin-bottom: 12px;">Un code de vérification a été généré. Veuillez saisir le code <strong id="generated-code-display" style="color: var(--primary);">----</strong> ci-dessous pour confirmer votre compte :</p>
+            <div class="form-group">
+                <input type="text" id="user-entered-code" class="form-input" placeholder="Saisir le code à 4 chiffres" maxlength="4">
+            </div>
+            <button class="btn btn-primary" onclick="confirmAccountCode()">Valider et Confirmer le Compte</button>
+        </div>
+    </div>
+
+    <!-- Navigation basse 5 boutons -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home', this)">
+            <span class="nav-icon">🏠</span>
+            <span>Accueil</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('chat', this)">
+            <span class="nav-icon">💬</span>
+            <span>Messagerie</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('projects', this)">
+            <span class="nav-icon">📈</span>
+            <span>Suivi</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('wallet', this)">
+            <span class="nav-icon">💰</span>
+            <span>Portefeuille</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('profile', this)">
+            <span class="nav-icon">👤</span>
+            <span>Profil</span>
+        </div>
+    </nav>    <!-- PARTIE 3 : JAVASCRIPT & LOGIQUE INTERACTIVE -->
+    <script>
+        // Variables globales
+        let currentVerificationCode = "";
+        let pendingUserData = null;
+
+        // Navigation entre les onglets
+        function switchTab(viewId, element) {
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            const targetSection = document.getElementById('view-' + viewId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            if (element) {
+                element.classList.add('active');
+            }
+            window.scrollTo(0, 0);
+        }
+
+        // Afficher / masquer la recherche
+        function toggleSearch() {
+            const searchBar = document.getElementById('search-bar');
+            if (searchBar.style.display === 'none' || searchBar.style.display === '') {
+                searchBar.style.display = 'block';
+                document.getElementById('search-input').focus();
+            } else {
+                searchBar.style.display = 'none';
+            }
+        }
+
+        // Filtrer les projets par mot-clé
+        function filterProjects() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            document.querySelectorAll('.project-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Filtrer par catégorie
+        function filterCategory(category, chipElement) {
+            document.querySelectorAll('.categories-scroll .chip').forEach(c => c.classList.remove('active'));
+            if (chipElement) chipElement.classList.add('active');
+
+            document.querySelectorAll('.project-item').forEach(item => {
+                const itemCat = item.getAttribute('data-category');
+                if (category === 'Tous' || itemCat === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Action d'investissement
+        function investInProject(projectName) {
+            alert("Merci de votre intérêt pour : " + projectName + " !\nUn agent de confirmation va entrer en contact avec vous dans la messagerie.");
+            switchTab('chat', document.querySelectorAll('.nav-item')[1]);
+        }
+
+        // Charger une image de couverture depuis la galerie
+        function loadCover(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profile-cover').style.backgroundImage = 'url(' + e.target.result + ')';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Charger une photo de profil (avatar) depuis la galerie
+        function loadAvatar(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profile-avatar').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Démarrer l'enregistrement et générer un code de vérification
+        function startAccountRegistration(event) {
+            event.preventDefault();
+            const nom = document.getElementById('input-nom').value.trim();
+            const prenom = document.getElementById('input-prenom').value.trim();
+            const postnom = document.getElementById('input-postnom').value.trim();
+            const pwd = document.getElementById('input-pwd').value;
+
+            if (!nom || !prenom || !pwd) {
+                alert("Veuillez remplir tous les champs obligatoires.");
+                return;
+            }
+
+            pendingUserData = { nom, prenom, postnom };
+            
+            // Générer un code à 4 chiffres aléatoire
+            currentVerificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+            document.getElementById('generated-code-display').innerText = currentVerificationCode;
+            document.getElementById('verify-modal').style.display = 'flex';
+        }
+
+        // Confirmer le code saisi
+        function confirmAccountCode() {
+            const enteredCode = document.getElementById('user-entered-code').value.trim();
+            if (enteredCode === currentVerificationCode) {
+                document.getElementById('verify-modal').style.display = 'none';
+                
+                // Mettre à jour le nom complet sur le profil
+                const fullName = pendingUserData.prenom + " " + pendingUserData.nom + " " + (pendingUserData.postnom || "");
+                document.getElementById('display-name').innerText = fullName;
+                
+                alert("✅ Votre compte a été vérifié et confirmé avec succès !");
+            } else {
+                alert("❌ Code incorrect. Veuillez réessayer.");
+            }
+        }
+
+        // Connexion au compte Chef d'Application / Fondateur
+        function unlockAdminMode() {
+            const pwd = prompt("Saisissez le mot de passe Chef d'Application :");
+            if (pwd === "CHEF2026") {
+                document.getElementById('display-status').innerText = "✓ Fondateur Certifié & Chef d'Application (Accès complet)";
+                document.getElementById('display-status').style.color = "var(--primary)";
+                alert("👑 Bienvenue Chef d'Application ! Accès administrateur déverrouillé.");
+            } else if (pwd !== null) {
+                alert("Accès refusé : Mot de passe incorrect.");
+            }
+        }
+
+        // Activer le code promo
+        function applyPromoCode() {
+            const code = document.getElementById('promo-code').value.trim();
+            if (code === "INVEST2026" || code === "PROMO2026") {
+                alert("🎉 Félicitations ! Le Mode Premium est maintenant activé sur votre compte.");
+            } else {
+                alert("Code promo invalide. Veuillez contacter le Chef d'application pour obtenir un code valide.");
+            }
+        }
+
+        // Activer/Désactiver le 2FA
+        function toggle2FA(checkbox) {
+            if (checkbox.checked) {
+                alert("🔒 L'authentification à deux facteurs (2FA) a été activée.");
+            } else {
+                alert("⚠️ La double authentification a été désactivée.");
+            }
+        }
+
+        // Changer le mot de passe
+        function changePassword() {
+            const newPwd = prompt("Entrez votre nouveau mot de passe :");
+            if (newPwd && newPwd.length >= 4) {
+                alert("Votre mot de passe a été mis à jour avec succès.");
+            } else if (newPwd) {
+                alert("Le mot de passe doit contenir au moins 4 caractères.");
+            }
+        }
+
+        // Gestion des notifications
+        function showNotifications() {
+            alert("🔔 Notifications :\n1. Votre contrat pour le projet Maïs est prêt.\n2. Nouveau message de l'agent support.");
+        }
+
+        // Ouvrir une discussion dans la messagerie
+        function openChat(name) {
+            alert("Ouverture de la discussion sécurisée avec : " + name);
+        }
+
+        // Gestion des moyens de paiement
+        function managePayment(type) {
+            alert("Redirection vers l'interface de gestion de vos comptes : " + type);
+        }
+    </script>
+</body>
+</html>    <!-- PARTIE 3-A : NAVIGATION, RECHERCHE & GALERIE -->
+    <script>
+        // Variables globales
+        let currentVerificationCode = "";
+        let pendingUserData = null;
+
+        // Navigation entre les 5 onglets
+        function switchTab(viewId, element) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+
+            const target = document.getElementById('view-' + viewId);
+            if (target) target.classList.add('active');
+            if (element) element.classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Afficher / masquer la barre de recherche
+        function toggleSearch() {
+            const bar = document.getElementById('search-bar');
+            if (bar.style.display === 'none' || bar.style.display === '') {
+                bar.style.display = 'block';
+                document.getElementById('search-input').focus();
+            } else {
+                bar.style.display = 'none';
+            }
+        }
+
+        // Filtrer les projets par mot-clé
+        function filterProjects() {
+            const q = document.getElementById('search-input').value.toLowerCase();
+            document.querySelectorAll('.project-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(q) ? 'block' : 'none';
+            });
+        }
+
+        // Filtrer par catégorie
+        function filterCategory(cat, chip) {
+            document.querySelectorAll('.categories-scroll .chip').forEach(c => c.classList.remove('active'));
+            if (chip) chip.classList.add('active');
+
+            document.querySelectorAll('.project-item').forEach(item => {
+                const itemCat = item.getAttribute('data-category');
+                item.style.display = (cat === 'Tous' || itemCat === cat) ? 'block' : 'none';
+            });
+        }
+
+        // Charger la couverture depuis la galerie photo
+        function loadCover(input) {
+            if (input.files && input.files[0]) {
+                const r = new FileReader();
+                r.onload = function(e) {
+                    document.getElementById('profile-cover').style.backgroundImage = 'url(' + e.target.result + ')';
+                };
+                r.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Charger l'avatar depuis la galerie photo
+        function loadAvatar(input) {
+            if (input.files && input.files[0]) {
+                const r = new FileReader();
+                r.onload = function(e) {
+                    document.getElementById('profile-avatar').src = e.target.result;
+                };
+                r.readAsDataURL(input.files[0]);
+            }
+        }        // Lancer l'inscription et générer le code
+        function startAccountRegistration(event) {
+            event.preventDefault();
+            const nom = document.getElementById('input-nom').value.trim();
+            const prenom = document.getElementById('input-prenom').value.trim();
+            const postnom = document.getElementById('input-postnom').value.trim();
+            const pwd = document.getElementById('input-pwd').value;
+
+            if (!nom || !prenom || !pwd) {
+                alert("Veuillez remplir tous les champs obligatoires.");
+                return;
+            }
+
+            pendingUserData = { nom, prenom, postnom };
+            
+            // Code de confirmation aléatoire à 4 chiffres
+            currentVerificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+            document.getElementById('generated-code-display').innerText = currentVerificationCode;
+            document.getElementById('verify-modal').style.display = 'flex';
+        }
+
+        // Valider le code de confirmation saisi
+        function confirmAccountCode() {
+            const code = document.getElementById('user-entered-code').value.trim();
+            if (code === currentVerificationCode) {
+                document.getElementById('verify-modal').style.display = 'none';
+                
+                // Mettre à jour le nom sur le profil
+                const fullName = pendingUserData.prenom + " " + pendingUserData.nom + " " + (pendingUserData.postnom || "");
+                document.getElementById('display-name').innerText = fullName;
+                
+                alert("✅ Votre compte a été vérifié et confirmé avec succès !");
+            } else {
+                alert("❌ Code incorrect. Veuillez réessayer.");
+            }
+        }
+
+        // Connexion Administrateur / Chef d'Application
+        function unlockAdminMode() {
+            const pwd = prompt("Saisissez le mot de passe Chef d'Application :");
+            if (pwd === "CHEF2026") {
+                document.getElementById('display-status').innerText = "✓ Fondateur Certifié & Chef d'Application (Accès complet)";
+                document.getElementById('display-status').style.color = "var(--primary)";
+                alert("👑 Bienvenue Chef d'Application ! Accès administrateur déverrouillé.");
+            } else if (pwd !== null) {
+                alert("Accès refusé : Mot de passe incorrect.");
+            }
+        }        // Activer un code promo
+        function applyPromoCode() {
+            const code = document.getElementById('promo-code').value.trim();
+            if (code === "INVEST2026" || code === "PROMO2026") {
+                alert("🎉 Félicitations ! Le Mode Premium est maintenant activé sur votre compte.");
+            } else {
+                alert("Code promo invalide. Contactez le Chef d'application pour obtenir un code.");
+            }
+        }
+
+        // Commutateur 2FA
+        function toggle2FA(checkbox) {
+            alert(checkbox.checked ? "🔒 2FA Activée avec succès !" : "⚠️ 2FA Désactivée.");
+        }
+
+        // Changer le mot de passe
+        function changePassword() {
+            const newPwd = prompt("Entrez votre nouveau mot de passe :");
+            if (newPwd && newPwd.length >= 4) {
+                alert("Votre mot de passe a été mis à jour.");
+            } else if (newPwd) {
+                alert("Le mot de passe doit contenir au moins 4 caractères.");
+            }
+        }
+
+        // Actions diverses (Notifications, Investir, Messagerie, Paiement)
+        function showNotifications() {
+            alert("🔔 Notifications :\n1. Votre contrat pour le projet Maïs est prêt.\n2. Nouveau message du support.");
+        }
+
+        function investInProject(projectName) {
+            alert("Merci de votre intérêt pour : " + projectName + " !\nUn agent va vous contacter.");
+            switchTab('chat', document.querySelectorAll('.nav-item')[1]);
+        }
+
+        function openChat(name) {
+            alert("Discussion avec : " + name);
+        }
+
+        function managePayment(type) {
+            alert("Gestion des comptes : " + type);
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
