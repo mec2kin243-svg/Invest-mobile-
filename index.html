@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plateforme d'Investissement & Crowdfunding</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #F8FAFC;
+            color: #0F172A;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #1E3A8A;
+            color: #FFFFFF;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            background-color: #1E3A8A;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background-color: #1D4ED8;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #CBD5E1;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Plateforme d'Investissement</h1>
+    </header>
+
+    <div class="container">
+        <h2>Créer un compte</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label>Nom Complet / Raison Sociale</label>
+                <input type="text" id="fullName" required placeholder="Ex: Jean Dupont">
+            </div>
+            <div class="form-group">
+                <label>Adresse Physique (Avenue, N°, Quartier, Commune, Ville)</label>
+                <input type="text" id="address" required placeholder="Ex: 12 Av. Luambo, Gombe, Kinshasa">
+            </div>
+            <div class="form-group">
+                <label>Numéro de Téléphone / Mobile Money</label>
+                <input type="tel" id="phone" required placeholder="Ex: +243810000000">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe</label>
+                <input type="password" id="password" required placeholder="Saisissez votre mot de passe">
+            </div>
+            <button type="button" class="btn" onclick="submitForm()">🚀 Créer mon compte</button>
+        </form>
+    </div>
+
+    <script>
+        async function submitForm() {
+            const password = document.getElementById('password').value;
+            
+            // Simulation de la vérification dynamique du mot de passe
+            if (password === "winner@2") {
+                alert("Connexion réussie en tant qu'Agent d'Administration ! Redirection vers le panneau admin...");
+            } else {
+                alert("Compte Utilisateur créé ! Un code de vérification SMS a été envoyé à votre numéro.");
+            }
+        }
+    </script>
+</body>
+</html>
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+// Inscription et détection du mot de passe admin
+app.post('/api/auth/register', async (req, res) => {
+  const { fullName, email, phone, address, password } = req.body;
+  const ADMIN_KEY = process.env.ADMIN_SECRET_KEY || "winner@2";
+
+  if (password === ADMIN_KEY) {
+    return res.json({ 
+      success: true, 
+      role: 'ADMIN_AGENT',
+      message: "Bienvenue dans le panneau d'administration." 
+    });
+  } else {
+    return res.json({ 
+      success: true, 
+      role: 'USER', 
+      requireOTP: true,
+      message: "Un code de confirmation vous a été envoyé par SMS." 
+    });
+  }
+});
+
+app.listen(3000, () => console.log('Serveur démarré sur le port 3000'));
