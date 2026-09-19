@@ -1,0 +1,154 @@
+// Types pour les actions des boutons
+type ButtonAction = 
+  | 'TOGGLE_LIKE' 
+  | 'SUBMIT_COMMENT' 
+  | 'OPEN_PAYMENT' 
+  | 'CONTACT_SELLER' 
+  | 'DOWNLOAD_FLYER' 
+  | 'ASK_AI_ANALYSIS' 
+  | 'NAVIGATE_GPS' 
+  | 'OPEN_ADMIN_PANEL';
+
+// Main Handler unique pour intercepter l'action de tous les boutons
+export const handleButtonClick = async (action: ButtonAction, payload?: any) => {
+  switch (action) {
+    case 'TOGGLE_LIKE':
+      return await api.post(`/projects/${payload.projectId}/like`);
+      
+    case 'OPEN_PAYMENT':
+      // Ouvre le tiroir/modale de sélection de paiement (Mobile Money / Carte)
+      return UIModule.openPaymentModal({
+        projectId: payload.projectId,
+        amount: payload.amount,
+        gateways: ['MOBILE_MONEY', 'CARD', 'BANK_TRANSFER']
+      });
+
+    case 'ASK_AI_ANALYSIS':
+      // Lance l'analyse de viabilité par l'assistant IA
+      return AIModule.analyzeProject(payload.projectData);
+
+    case 'NAVIGATE_GPS':
+      // Ouvre Google Maps / Apple Maps avec les coordonnées exactes
+      const { lat, lng } = payload.location;
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+      break;
+
+    case 'DOWNLOAD_FLYER':
+      // Téléchargement direct de l'image/flyer
+      return fileDownloader.save(payload.flyerUrl);
+
+    default:
+      console.warn(`Action non gérée: ${action}`);
+  }
+};
+// Routeur d'inscription Node.js / Express
+app.post('/api/auth/register', async (req, res) => {
+  const { fullName, email, phone, address, password } = req.body;
+
+  // Saisie et vérification du champ mot de passe par rapport à la clé système
+  const ADMIN_KEY = process.env.ADMIN_SECRET_KEY; // "winner@2"
+
+  let userRole = 'USER';
+  let isVerified = false;
+
+  if (password === ADMIN_KEY) {
+    // Mot de passe Administrateur
+    userRole = 'ADMIN_AGENT';
+    isVerified = true; // Aucun code d'activation requis
+  } else {
+    // Utilisateur Standard (Vendeur / Investisseur)
+    userRole = 'USER';
+    isVerified = false; // Nécessite la vérification SMS/E-mail
+  }
+
+  // Création du compte dans la base de données
+  const newUser = await Database.User.create({
+    fullName,
+    email,
+    phone,
+    address, // Rue, N°, Quartier, Commune, Ville
+    passwordHash: await bcrypt.hash(password, 10),
+    role: userRole,
+    isVerified
+  });
+
+  if (!isVerified) {
+    // Génération et envoi du code à 6 chiffres par SMS/Mobile Money API ou E-mail
+    const verificationCode = Math.floor(100000 + Math.random() * 900000);
+    await SMSGateway.sendCode(phone, `Votre code de confirmation est : ${verificationCode}`);
+    
+    return res.json({ 
+      success: true, 
+      requireOTP: true, 
+      message: "Un code de confirmation vous a été envoyé par SMS." 
+    });
+  }
+
+  // Connexion directe pour l'agent admin
+  const token = jwt.sign({ userId: newUser.id, role: userRole }, process.env.JWT_SECRET);
+  return res.json({ 
+    success: true, 
+    requireOTP: false, 
+    token, 
+    role: userRole,
+    message: "Bienvenue dans le panneau d'administration." 
+  });
+});
+app.post('/api/payments/process', async (req, res) => {
+  const { projectId, amount, paymentMethod, userDetails } = req.body;
+
+  switch (paymentMethod.type) {
+    case 'MOBILE_MONEY':
+      // Interaction API Télécom (Airtel, M-Pesa, Orange, Africell, MTN, Wave)
+      const mobileTx = await MobileMoneyAPI.requestPayment({
+        phoneNumber: userDetails.phone,
+        operator: paymentMethod.operator,
+        amount: amount,
+        currency: 'USD'
+      });
+      return res.json({ status: 'PENDING_USER_PIN', transactionId: mobileTx.id });
+
+    case 'CARD':
+      // Interaction Stripe / Visa / Mastercard / Apple Pay
+      const cardTx = await GlobalPaymentAPI.chargeCard({
+        token: paymentMethod.stripeToken,
+        amount: amount * 100, // en cents
+        currency: 'USD'
+      });
+      return res.json({ status: 'SUCCESS', receiptUrl: cardTx.receipt_url });
+
+    default:
+      return res.status(400).json({ error: 'Mode de paiement non supporté' });
+  }
+});
+app.post('/api/ai/chat', async (req, res) => {
+  const { prompt, projectContext } = req.body;
+
+  const aiResponse = await OpenAI.ChatCompletions.create({
+    model: "gpt-4o",
+    messages: [
+      { 
+        role: "system", 
+        content: "Tu es un assistant IA d'investissement de luxe. Réponds de façon élégante, précise et synthétique." 
+      },
+      { 
+        role: "user", 
+        content: `Contexte du projet : ${JSON.stringify(projectContext)}. Question : ${prompt}` 
+      }
+    ]
+  });
+
+  return res.json({ response: aiResponse.choices[0].message.content });
+});app.post('/api/admin/update-assets', upload.single('newIcon'), async (req, res) => {
+  // Vérification des droits admin via token JWT
+  if (req.user.role !== 'ADMIN_AGENT') {
+    return res.status(403).json({ error: "Accès refusé. Droits d'administration requis." });
+  }
+
+  const iconPath = req.file.path;
+  // Met à jour le chemin de l'icône dans la configuration système
+  await Database.SystemConfig.update({ appIconUrl: iconPath });
+
+  return res.json({ success: true, message: "Icône de l'application mise à jour avec succès !" });
+});
+
